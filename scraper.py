@@ -3,6 +3,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import logging
 import time, random
+import re
 
 logging.basicConfig(level=logging.INFO)
 logging.basicConfig(level=logging.DEBUG)
@@ -12,6 +13,14 @@ helper = Helper()
 
 #----------- container for storing scraped links -----------
 links = []
+
+# Element extraction code.
+def safe_find(driver, xpath):
+    try:
+        return driver.find_element(By.XPATH,xpath).text
+    except:
+        return None
+
 
 
 driver, wait = helper.open_browser()
@@ -57,5 +66,47 @@ for index in range(len(products)):
     if d_link is not None:
         links.append(d_link)
 
+##===================== LOOPING THROUGH THE DETAIL LINKS STORED AND VISITING EACH OF THEM =============
+for index in range(len(links)):
+    try:
+        detail_link = links[index]
+    except IndexError:
+        logging.info("Index out of range, breaking loop")
+
+    driver = helper.load_site(driver, detail_link)
+
+    title = safe_find(driver, "//div[contains(@class,'ProductDetails')]//h1")
+    marked_price = safe_find(driver, "//div[contains(@class,'ProductDetails')]//del")
+    ##---for model section
+    model1 = safe_find(driver, "//div[contains(@class,'ProductDetails')]//span[contains(text(),'Model')]/parent::div")
+    try:
+        match = re.search(r"Model:\s*([a-zA-Z0-9\-]+)", model1)
+        
+        model = match.group(1)
+    except:
+        model = model1
+
+    try:
+        spec_btn = driver.find_element(By.XPATH,"//button[contains(text(),'Specifications')]")
+    except:
+        logging.debug("spec not found")
+        input("stark ?")
+
+    driver.execute_script("arguments[0].scrollIntoView({block:'centre'});", spec_btn)
+    driver.execute_script("arguments[0].click()", spec_btn)
+
+    movement = safe_find(driver, "//span[text()='Movement']/following-sibling::span")
+    resistance = safe_find(driver, "//span[text()='Water Resistance']/following-sibling::span")
+
+    info = f'''
+title = {title}
+m_price = {marked_price}
+model = {model}
+movement = {movement}
+resistance = {resistance}
+link = {detail_link}
+'''
+    print(info)
+    input("do you want to continue")
 
 
