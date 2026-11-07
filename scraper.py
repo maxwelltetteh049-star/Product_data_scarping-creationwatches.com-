@@ -1,6 +1,7 @@
 from helpers import Helper
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+import mysql.connector
 import logging
 import time, random
 import re
@@ -20,6 +21,17 @@ def safe_find(driver, xpath):
         return driver.find_element(By.XPATH,xpath).text
     except:
         return None
+    
+##======  connecting mysql database to python =============
+conn = mysql.connector.connect(
+    host = "localhost",
+    user = "root",
+    password = "passworDmax15$",
+    database = "webscraping_db"
+)
+cursor = conn.cursor()
+cursor.execute("ALTER TABLE watches ADD UNIQUE(detail_link)")
+
 
 
 
@@ -98,15 +110,23 @@ for index in range(len(links)):
     movement = safe_find(driver, "//span[text()='Movement']/following-sibling::span")
     resistance = safe_find(driver, "//span[text()='Water Resistance']/following-sibling::span")
 
-    info = f'''
-title = {title}
-m_price = {marked_price}
-model = {model}
-movement = {movement}
-resistance = {resistance}
-link = {detail_link}
+    #info = f'''
+#title = {title}
+#m_price = {marked_price}
+#model = {model}
+#movement = {movement}
+#resistance = {resistance}
+#link = {detail_link}
+#'''
+    #print(info)
+
+    infoo = (title, marked_price, model, movement, resistance, detail_link)
+    query = '''
+INSERT IGNORE INTO watches(title, marked_price, model_no, movement, resistance, detail_link)
+VALUES(%s, %s, %s, %s, %s, %s)
 '''
-    print(info)
-    input("do you want to continue")
+    cursor.execute(query, infoo)
+    conn.commit()
+    print(f"Extracted and stored data for product {index+1}")
 
 
