@@ -5,6 +5,7 @@ import mysql.connector
 import logging
 import time, random
 import re
+import csv
 
 logging.basicConfig(level=logging.INFO)
 logging.basicConfig(level=logging.DEBUG)
@@ -128,5 +129,19 @@ VALUES(%s, %s, %s, %s, %s, %s)
     cursor.execute(query, infoo)
     conn.commit()
     print(f"Extracted and stored data for product {index+1}")
+
+#loadING stored data back to python
+query1 = "SELECT * FROM watches"
+cursor.execute(query1)
+data = cursor.fetchall()
+
+# saving scraped data into csv file
+filename = "product.csv"
+with open(filename, "w", newline="", encoding='utf-8') as file:
+    writer = csv.writer(file)
+    writer.writerow(["Title", "Marked Price", "Model_no", "Movement", "Resistance", "Detail Link"])
+    writer.writerows(data)
+
+logging.info("SCRAPINGG IS A SUCCESS")
 
 
