@@ -10,7 +10,8 @@ logging.basicConfig(level=logging.DEBUG)
 #---------------object for calling the functions in the helper.py -------------
 helper = Helper()
 
-
+#----------- container for storing scraped links -----------
+links = []
 
 
 driver, wait = helper.open_browser()
@@ -39,5 +40,22 @@ while True:
 
 products = driver.find_elements(By.XPATH,"//div[contains(@class,'productBox')]")
 
-time.sleep(3333)
+##=================== LOOPING THROUGH THE LISTING PRODUCTS AND EXTRACTING THEIR DETAIL PAGE LINK =============
+for index in range(len(products)):
+    try:
+        product = products[index]
+    except IndexError:
+        logging.info("Index out of range breakinng loop")
+        break
+
+    try:
+        d_link = product.find_element(By.XPATH,".//a[@class='imgBox']").get_attribute("href")
+    except:
+        d_link = None
+    
+    print(d_link)
+    if d_link is not None:
+        links.append(d_link)
+
+
 
