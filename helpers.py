@@ -1,6 +1,6 @@
 import undetected_chromedriver as uc
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, TimeoutException
 import time, random
 import logging
 
@@ -23,9 +23,18 @@ class Helper:
         while atmp <= atmps:
             try:
                 driver = uc.Chrome(options=options, version_main=150)
+
+                driver.set_page_load_timeout(40)
+
                 wait = WebDriverWait(driver, 40)
                 logging.info("Browser is OPENED")
                 break
+            except TimeoutException:
+                print("Page loading timeout exception")
+                time.sleep(5)
+                print("retrying in 10 secs")
+                time.sleep(10)
+
             except Exception as e:
                 logging.info(f"Browser opening exception == {e}")
                 if atmp == atmps:

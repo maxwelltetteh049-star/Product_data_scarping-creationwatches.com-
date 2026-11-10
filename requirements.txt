@@ -1,0 +1,6 @@
+# here are the packages.
+selenium
+undetected-chromedriver
+mysql-connector-python
+
+# you have to install mysql workbench or connect to a mysql cloud database.

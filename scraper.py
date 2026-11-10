@@ -17,6 +17,7 @@ helper = Helper()
 links = []
 
 # Element extraction code.
+
 def safe_find(driver, xpath):
     try:
         return driver.find_element(By.XPATH,xpath).text
@@ -129,6 +130,7 @@ VALUES(%s, %s, %s, %s, %s, %s)
     cursor.execute(query, infoo)
     conn.commit()
     print(f"Extracted and stored data for product {index+1}")
+    
 
 #loadING stored data back to python
 query1 = "SELECT * FROM watches"
@@ -136,7 +138,7 @@ cursor.execute(query1)
 data = cursor.fetchall()
 
 # saving scraped data into csv file
-filename = "product.csv"
+filename = "products.csv"
 with open(filename, "w", newline="", encoding='utf-8') as file:
     writer = csv.writer(file)
     writer.writerow(["Title", "Marked Price", "Model_no", "Movement", "Resistance", "Detail Link"])
